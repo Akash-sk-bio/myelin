@@ -1,0 +1,17 @@
+# build output
+bin/
+obj/
+build/
+dist/
+out/
+release/
+
+# local test output
+selftest/
+snaps/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>Myelin</AssemblyName>
+    <RootNamespace>Myelin</RootNamespace>
+    <StartupObject>Myelin.Program</StartupObject>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <Product>Myelin</Product>
+    <Description>Liquid-glass animated pointers and live Bio-AI cursor effects for Windows.</Description>
+    <Authors>Akash Sk</Authors>
+    <Company>Akash Sk</Company>
+    <Copyright>© 2026 Akash Sk</Copyright>
+    <Version>3.0.0</Version>
+    <!-- No WinForms designer in this project; runtime-only properties don't need serialization attributes. -->
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="Exists('..\..\assets\Myelin.ico')">
+    <ApplicationIcon>..\..\assets\Myelin.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <!-- WPF + WinForms in one project: keep WinForms/GDI+ names out of the global namespace to avoid clashes. -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <!-- WPF drops System.IO from implicit usings (Path vs Shapes.Path); we alias Shapes instead. -->
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+</Project>

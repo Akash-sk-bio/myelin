@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish self-contained (runs without installing .NET)
+        run: dotnet publish src/Myelin -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -o out/sc
+
+      - name: Publish lite (needs .NET 10 Desktop Runtime)
+        run: dotnet publish src/Myelin -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=none -o out/fd
+
+      - name: Self-test
+        shell: pwsh
+        run: |
+          $p = Start-Process out/sc/Myelin.exe -ArgumentList "--selftest","selftest" -Wait -PassThru
+          Get-Content selftest/report.txt
+          if ($p.ExitCode -ne 0) { exit $p.ExitCode }
+
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force release | Out-Null
+          Copy-Item out/sc/Myelin.exe "release/Myelin-$env:TAG-win-x64.exe"
+          Copy-Item out/fd/Myelin.exe "release/Myelin-$env:TAG-win-x64-lite.exe"
+          Compress-Archive -Path out/sc/Myelin.exe, README.md, LICENSE -DestinationPath "release/Myelin-$env:TAG-win-x64.zip"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true

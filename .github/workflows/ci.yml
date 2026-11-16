@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build
+        run: dotnet build src/Myelin -c Release
+
+      - name: Self-test (render packs, load every cursor through Win32)
+        shell: pwsh
+        run: |
+          $exe = "src/Myelin/bin/Release/net10.0-windows/Myelin.exe"
+          $p = Start-Process $exe -ArgumentList "--selftest","selftest" -Wait -PassThru
+          Get-Content selftest/report.txt
+          if ($p.ExitCode -ne 0) { exit $p.ExitCode }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: selftest-proofs
+          path: selftest/*.png
