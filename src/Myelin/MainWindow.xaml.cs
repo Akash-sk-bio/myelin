@@ -78,7 +78,7 @@ public static class Look
 public partial class MainWindow : Window
 {
     /// <summary>Set to your repository URL before publishing (shows the GitHub link).</summary>
-    public const string RepoUrl = "";
+    public const string RepoUrl = "https://github.com/Akash-sk-bio/myelin";
     const string InstaUrl = "https://www.instagram.com/akashsk.ai/";
 
     static readonly (string Name, string Hex)[] TintSet =
